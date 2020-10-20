@@ -68,31 +68,39 @@ namespace dolphin {
      * ### params
      *
      * - `{uint64_t} pair_id` - pair id
-     * - `{symbol} sort` - sort by symbol (reserve0 will be first item in pair)
+     * - `{symbol} from - which symbol we convert from 
+     * - `{symbol} to - which symbol we convert to
      *
      * ### returns
      *
-     * - `{pair<asset, asset>}` - pair of reserve assets
+     * - `{pair<pair<asset, uint64_t>, pair<asset,uint64_t>>}` - pair of reserve assets as {reserve, weight} pair
      *
      * ### example
      *
      * ```c++
      * const uint64_t pair_id = 1;
-     * const symbol sort = symbol{"EOS", 4};
+     * const symbol from = symbol{"EOS", 4};
+     * const symbol to = symbol{"DOP", 4};
      *
-     * const auto [reserve0, reserve1] = dolphin::get_reserves( pair_id, sort );
-     * // reserve0 => "4638.5353 EOS"
-     * // reserve1 => "13614.8381 DOP"
+     * const auto [reserve0, reserve1] = dolphin::get_reserves( pair_id, from, to );
+     * // reserve0 => {"4638.5353 EOS", 50}
+     * // reserve1 => {"13614.8381 DOP", 50}
      * ```
      */
-    static pair<pair<asset, uint64_t>, pair<asset, uint64_t>> get_reserves( const uint64_t pair_id, const symbol sort )
+    static pair<pair<asset, uint64_t>, pair<asset, uint64_t>> get_reserves( const uint64_t pair_id, const symbol from, const symbol to )
     {
         // table
         dolphin::pools _pools( "dolphinsswap"_n, "dolphinsswap"_n.value );
         auto pool = _pools.get(pair_id, "DolphinLibrary: INVALID_PAIR_ID");
+        pair<asset, uint64_t> res1, res2;
 
-        return sort == pool.tokens[0].symbol.get_symbol() ?
-            pair<pair<asset, uint64_t>, pair<asset, uint64_t>>{{ pool.tokens[0].reserve, pool.tokens[0].weight}, { pool.tokens[1].reserve, pool.tokens[1].weight} } :
-            pair<pair<asset, uint64_t>, pair<asset, uint64_t>>{{ pool.tokens[1].reserve, pool.tokens[1].weight}, { pool.tokens[0].reserve, pool.tokens[0].weight} };
+        for(auto& token: pool.tokens){
+            if(token.symbol.get_symbol()==from)
+                res1 = { token.reserve, token.weight};
+            if(token.symbol.get_symbol()==to)
+                res2 = { token.reserve, token.weight};
+        }
+        check(res1.first.amount && res2.first.amount, "CDolphinLibrary: INVALID_PAIR_SYMBOLS");
+        return {res1, res2};
     }
 }
