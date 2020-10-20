@@ -85,14 +85,14 @@ namespace dolphin {
      * // reserve1 => "13614.8381 DOP"
      * ```
      */
-    static pair<asset, asset> get_reserves( const uint64_t pair_id, const symbol sort )
+    static pair<pair<asset, uint64_t>, pair<asset, uint64_t>> get_reserves( const uint64_t pair_id, const symbol sort )
     {
         // table
         dolphin::pools _pools( "dolphinsswap"_n, "dolphinsswap"_n.value );
         auto pool = _pools.get(pair_id, "DolphinLibrary: INVALID_PAIR_ID");
 
         return sort == pool.tokens[0].symbol.get_symbol() ?
-            pair<asset, asset>{ pool.tokens[0].reserve, pool.tokens[1].reserve } :
-            pair<asset, asset>{ pool.tokens[1].reserve, pool.tokens[0].reserve };
+            pair<pair<asset, uint64_t>, pair<asset, uint64_t>>{{ pool.tokens[0].reserve, pool.tokens[0].weight}, { pool.tokens[1].reserve, pool.tokens[1].weight} } :
+            pair<pair<asset, uint64_t>, pair<asset, uint64_t>>{{ pool.tokens[1].reserve, pool.tokens[1].weight}, { pool.tokens[0].reserve, pool.tokens[0].weight} };
     }
 }
