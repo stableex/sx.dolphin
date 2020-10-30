@@ -68,7 +68,7 @@ namespace dolphin {
      * ### params
      *
      * - `{uint64_t} pair_id` - pair id
-     * - `{symbol} from - which symbol we convert from 
+     * - `{symbol} from - which symbol we convert from
      * - `{symbol} to - which symbol we convert to
      *
      * ### returns
@@ -91,16 +91,17 @@ namespace dolphin {
     {
         // table
         dolphin::pools _pools( "dolphinsswap"_n, "dolphinsswap"_n.value );
-        auto pool = _pools.get(pair_id, "DolphinLibrary: INVALID_PAIR_ID");
+        auto poolit = _pools.find(pair_id);
+        check(poolit!=_pools.end(), "DolphinLibrary: INVALID_PAIR_ID "+to_string(pair_id) + " for " + from.code().to_string()+"->"+to.code().to_string());
         pair<asset, uint64_t> res1, res2;
 
-        for(auto& token: pool.tokens){
+        for(auto& token: poolit->tokens){
             if(token.symbol.get_symbol()==from)
                 res1 = { token.reserve, token.weight};
             if(token.symbol.get_symbol()==to)
                 res2 = { token.reserve, token.weight};
         }
-        check(res1.first.amount && res2.first.amount, "CDolphinLibrary: INVALID_PAIR_SYMBOLS");
+
         return {res1, res2};
     }
 }
