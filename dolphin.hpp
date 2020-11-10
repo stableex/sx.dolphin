@@ -16,6 +16,10 @@ namespace dolphin {
     using std::vector;
     using std::pair;
 
+    const name id = "dolphin"_n;
+    const name code = "dolphinsswap"_n;
+    const string description = "Dolphin Converter";
+
     /**
      * pools
      */
