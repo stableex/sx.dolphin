@@ -1,7 +1,6 @@
 #pragma once
 
 #include <eosio/asset.hpp>
-#include <eosio/singleton.hpp>
 
 namespace dolphin {
 
@@ -11,14 +10,14 @@ namespace dolphin {
     using eosio::symbol_code;
     using eosio::name;
     using eosio::multi_index;
-    using eosio::singleton;
+    using eosio::check;
 
     using std::vector;
     using std::pair;
 
     const name id = "dolphin"_n;
     const name code = "dolphinsswap"_n;
-    const string description = "Dolphin Converter";
+    const std::string description = "Dolphin Converter";
 
     /**
      * pools
@@ -96,7 +95,7 @@ namespace dolphin {
         // table
         dolphin::pools _pools( "dolphinsswap"_n, "dolphinsswap"_n.value );
         auto poolit = _pools.find(pair_id);
-        check(poolit!=_pools.end(), "DolphinLibrary: INVALID_PAIR_ID "+to_string(pair_id) + " for " + from.code().to_string()+"->"+to.code().to_string());
+        check(poolit!=_pools.end(), "DolphinLibrary: INVALID_PAIR_ID");
         pair<asset, uint64_t> res1, res2;
 
         for(auto& token: poolit->tokens){
